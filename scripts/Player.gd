@@ -1,16 +1,18 @@
 extends Area2D
+signal pickup
+signal hurt
+
 export (int) var speed
 var velocity:Vector2=Vector2.ZERO
+var ScreenSize:Vector2
 
-func _ready():
-	start()
 	
 #this function executes every frame
 func _process(delta):
 	get_input()
 	position+=velocity*delta
-	position.x=clamp(position.x,0,get_viewport().get_visible_rect().size.x)
-	position.y=clamp(position.y,0,get_viewport().get_visible_rect().size.y)
+	position.x=clamp(position.x,0,ScreenSize.x)
+	position.y=clamp(position.y,0,ScreenSize.y)
 	
 
 #get_input() handles all the input stuff from player [mouse, keyboard, touch]
@@ -32,6 +34,20 @@ func get_input():
 func die():
 	set_process(false)
 
-func start():
+func start(pos):
 	set_process(true)
-	
+	position=pos	
+
+
+func _on_Player_area_entered(area):
+	if area.is_in_group("coins"):
+		area.pickup()
+		emit_signal("pickup")
+		print("coin picked up")
+	if area.is_in_group("obs"):
+		emit_signal("hurt")
+		die()
+		print("died!")
+		
+		
+	#pass # Replace with function body.
